@@ -1,6 +1,9 @@
+import os
+
 from pptx import Presentation
 from pptx.enum.text import PP_ALIGN
-import ppt_to_pdf
+import sendmail
+from docx2pdf import convert
 
 
 def replace_ppt_text(replacements, email):
@@ -16,5 +19,11 @@ def replace_ppt_text(replacements, email):
                                 run.text = run.text.replace(old_word, new_word)
                                 paragraph.alignment = PP_ALIGN.CENTER
     prs.save(f'ppts\\{replacements[0][1]}.pptx')
+    convert(f'ppts\\{replacements[0][1]}.pptx', f'ppts\\{replacements[0][1]}.pdf')
     print('ppt generated successfully ')
-    ppt_to_pdf.ppt_to_pdf(f'{replacements[0][1]}.pptx', f'{replacements[0][1]}.pdf', email)
+    # sendmail.send_mail(email, fr'ppts\{replacements[0][1]}.pptx')
+    # ppt_to_pdf.ppt_to_pdf(f'{replacements[0][1]}.pptx', f'{replacements[0][1]}.pdf', email)
+
+
+replacements = [('{name}', 'row[0]'), ('{college}', 'row[1')]
+replace_ppt_text(replacements, "")

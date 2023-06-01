@@ -5,14 +5,11 @@ from email.mime.base import MIMEBase
 from email import encoders
 import os
 
+
 def send_mail(receiver, file):
     body = '''Here is your certificate'''
     sender = 'envision.sitmng@gmail.com'
     password = 'gspzbhhdmhppizjo'
-    # put the email of the receiver here
-    # receiver = 'adarshsavaligi@gmail.com'
-
-    # Set up the MIME
     message = MIMEMultipart()
     message['From'] = sender
     message['To'] = receiver
@@ -20,33 +17,23 @@ def send_mail(receiver, file):
 
     message.attach(MIMEText(body, 'plain'))
 
-    binary_pdf = open(file, 'rb')
+    attachment = open(file, "rb")
 
-    payload = MIMEBase('application', 'octate-stream', Name=file)
-    # payload = MIMEBase('application', 'pdf', Name=pdfname)
-    payload.set_payload(binary_pdf.read())
+    payload = MIMEBase("application", "octet-stream")
+    payload.set_payload(attachment.read())
 
     # enconding the binary into base64
     encoders.encode_base64(payload)
 
     # add header with pdf name
-    payload.add_header('Content-Decomposition', 'attachment', filename=file)
+    payload.add_header('Content-Disposition', 'attachment', filename='certificate.pdf')
     message.attach(payload)
-
-    # use gmail with port
-    session = smtplib.SMTP('smtp.gmail.com', 587)
     try:
-    # enable security
-        session.starttls()
-
-        # login with mail_id and password
-        session.login(sender, password)
-
-        text = message.as_string()
-        session.sendmail(sender, receiver, text)
-        session.quit()
-
+        server = smtplib.SMTP('smtp.gmail.com: 587')
+        server.starttls()
+        server.login(sender, password)
+        server.sendmail(message['From'], message['To'], message.as_string())
+        server.quit()
         print(f'Mail Sent to {receiver}')
     except Exception as e:
-        print(f"message not sent {receiver} beacuse {e}")
-
+        print(f"message not sent {receiver} because {e}")
